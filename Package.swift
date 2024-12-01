@@ -6,6 +6,7 @@ let dependencies: [Target.Dependency] = [
   .product(name: "ArgumentParser", package: "swift-argument-parser"),
   .product(name: "Collections", package: "swift-collections"),
   .product(name: "Parsing", package: "swift-parsing"),
+  .product(name: "AoCTools", package: "AoCTools")
 ]
 
 let package = Package(
@@ -27,6 +28,10 @@ let package = Package(
     .package(
       url: "https://github.com/pointfreeco/swift-parsing",
       from: "0.13.0"
+    ),
+    .package(
+      url: "https://github.com/darrengillman/AoCTools.git",
+      from: "1.0.0"
     ),
     .package(path: "NewDayPlugin"),
   ],
