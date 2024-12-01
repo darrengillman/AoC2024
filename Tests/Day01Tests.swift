@@ -1,9 +1,9 @@
-import Testing
+  import Testing
 
-@testable import AdventOfCode
+  @testable import AdventOfCode
 
-@Suite("Day00")
-struct Day00Tests {
+  @Suite("Day01 Tests")
+  struct Day01Tests {
   @Suite("Parser Tests")
   struct ParserTests {
     @Test("Test parser implementation")
@@ -16,7 +16,7 @@ struct Day00Tests {
   struct SolutionsTests {
     @Suite("Tests on sample inputs")
     struct SolutionsTests {
-      let day = Day00(data: testInput)
+      let day = Day01(data: testInput)
 
       @Test("Part1 example")
       func testPart1() async throws {
@@ -39,5 +39,4 @@ struct Day00Tests {
 
 private let testInput =
   """
-  
   """

@@ -12,7 +12,10 @@ struct Day00: AdventDay, Sendable {
 
   // Replace this with your solution for the first part of the day's challenge.
   func part1() async throws -> Int {
-    0
+     data
+        .components(separatedBy: .newlines)
+        .compactMap{(Int($0))}
+        .reduce(0, +)
   }
 }
 

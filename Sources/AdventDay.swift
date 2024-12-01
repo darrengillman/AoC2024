@@ -1,5 +1,5 @@
-@_exported import Algorithms
-@_exported import Collections
+import Algorithms
+import Collections
 import Foundation
 
 protocol AdventDay: Sendable {
