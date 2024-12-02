@@ -6,7 +6,7 @@ let dependencies: [Target.Dependency] = [
   .product(name: "ArgumentParser", package: "swift-argument-parser"),
   .product(name: "Collections", package: "swift-collections"),
   .product(name: "Parsing", package: "swift-parsing"),
-  .product(name: "AoCTools", package: "AoCTools")
+  .product(name: "AoCTools", package: "aoctools")
 ]
 
 let package = Package(

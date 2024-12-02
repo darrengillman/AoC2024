@@ -1,7 +1,8 @@
 import Algorithms
 import Collections
 import Foundation
-import 
+import AoCTools
+
 
 protocol AdventDay: Sendable {
   associatedtype Answer

@@ -1,7 +1,6 @@
 import Testing
 
 @testable import AdventOfCode
-
 @Suite("Package Tests")
 struct AdventDayTests {
   @Test("Validate that data can be loaded")

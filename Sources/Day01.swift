@@ -1,3 +1,4 @@
+import AoCTools
 import Foundation
 
 struct Day01: AdventDay, Sendable {
@@ -12,13 +13,13 @@ struct Day01: AdventDay, Sendable {
    
       // Replace this with your solution for the first part of the day's challenge.
    func part1() async throws -> Int {
-      zip(parse(data).0, parse(data).1)
+      zip(process(data).0, process(data).1)
          .reduce(0){ $0 + abs($1.0 - $1.1)}
    }
    
    
    func part2() -> Int {
-      let input = parse(data)
+      let input = process(data)
       let counted = NSCountedSet(array: input.1)
       
       return input.0
@@ -31,12 +32,8 @@ struct Day01: AdventDay, Sendable {
 
    // Add any extra code and types in here to separate it from the required behaviour
 extension Day01 {
-   func parse(_ data: String) -> ([Int], [Int]) {
-      let input = data
-         .components(separatedBy: .newlines)
-         .filter{!$0.isEmpty}
-         .map{$0.components(separatedBy: .whitespaces)}
-         .map{$0.filter{!$0.isEmpty}}
+   func process(_ data: String) -> ([Int], [Int]) {
+      let input = parse(data)
          .map{$0.map{Int($0)!}}
       
       let seq1 = input.map{$0.first!}.sorted(by: <)
