@@ -4,7 +4,7 @@ struct Day00: AdventDay, Sendable {
   // Save your data in a corresponding text file in the `Data` directory.
   let data: String
   let day = 0
-  let puzzleName: String = "--- Day 0: Placeholder! ---"
+  let puzzleName: String = "--- Day \(day) ---"
 
   init(data: String) {
     self.data = data
