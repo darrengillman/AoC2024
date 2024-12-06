@@ -1,7 +1,6 @@
 import Algorithms
 import Collections
 import Foundation
-import AoCTools
 
 
 protocol AdventDay: Sendable {

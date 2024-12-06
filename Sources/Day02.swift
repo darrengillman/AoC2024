@@ -5,8 +5,8 @@
 //  Created by Darren Gillman on 02/12/2024.
 //
 
-import AoCTools
 import Foundation
+import AoCTools
 
 struct Day02: AdventDay, Sendable {
       // Save your data in a corresponding text file in the `Data` directory.
