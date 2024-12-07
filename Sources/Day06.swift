@@ -37,7 +37,29 @@ struct Day06: AdventDay, Sendable {
       }
       return guardess.steps
    }
+   
+   func part2() async throws -> Int {
+      let (start, direction) = findStart()!
+      var guardess = Guardess(location: start, direction: direction, xRange: rangeX, yRange: rangeY)
+      while guardess.inBounds {
+         guardess.move(in: map)
+      }
+      
+      let possibles = guardess.visited.map{$0.point}.filter{$0 != start}
+      
+      let filtered = possibles.filter{ possible in
+         let updatedMap = map.union([possible])
+         var guardess = Guardess(location: start, direction: direction, xRange: rangeX, yRange: rangeY)
+         while guardess.inBounds && !guardess.looping{
+            guardess.move(in: updatedMap)
+         }
+//         print("OOB: \(!guardess.inBounds), looping: \(guardess.looping)")
+         return guardess.looping
+      }
+      return filtered.count
+   }
 }
+
 
    // Add any extra code and types in here to separate it from the required behaviour
 extension Day06 {
@@ -54,11 +76,24 @@ extension Day06 {
       return nil
    }
    
+   struct History: Hashable, Equatable {
+      static func == (lhs: History, rhs: History) -> Bool {
+         lhs.point == rhs.point
+      }
+      func hash(into hasher: inout Hasher) {
+         hasher.combine(point)
+      }
+      let point: Point
+      let heading: Heading
+   }
+   
    struct Guardess: Sendable {
       var location: Point
       var direction: Heading
-      var visited: Set<Point>
+      var visited: Set<History>
       let xRange, yRange: Range<Int>
+      var looping = false
+      
       var steps: Int {visited.count - 1}  //final out of bounds is added to set - CBA to fix it :)
       
       init(location: Point, direction: Heading, xRange: Range<Int>, yRange: Range<Int>) {
@@ -66,7 +101,7 @@ extension Day06 {
          self.direction = direction
          self.xRange = xRange
          self.yRange = yRange
-         self.visited = [location]
+         self.visited = [.init(point: location, heading: direction)]
       }
 
       var inBounds: Bool {
@@ -74,13 +109,14 @@ extension Day06 {
       }
       
       mutating func move(in map: Set<Point>) {
-         let (_, dX, dY) = direction.moving()
+         let (heading, dX, dY) = direction.moving()
          let forward = Point(location.x + dX, location.y + dY)
          if map.contains(forward) {
             direction = direction.turn()
          } else {
             location = forward
-            visited.insert(forward)
+            looping = visited.contains(where: {$0.point == location && $0.heading == direction})
+            visited.insert(.init(point: forward, heading: heading))
          }
       }
    }
