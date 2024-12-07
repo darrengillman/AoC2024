@@ -20,10 +20,8 @@
 
       @Test("Part1 example")
       func testPart1() async throws {
-        await withKnownIssue {
           let result = try await day.part1()
-          #expect(result == 10)
-        }
+          #expect(result == 41)
       }
 
       @Test("Part2 example")
@@ -39,4 +37,14 @@
 
 private let testInput =
   """
+  ....#.....
+  .........#
+  ..........
+  ..#.......
+  .......#..
+  ..........
+  .#..^.....
+  ........#.
+  #.........
+  ......#...
   """
