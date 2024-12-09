@@ -4,43 +4,37 @@ extension ArraySlice {
    func asArray() -> Array<Self> { Array(arrayLiteral: self) }
 }
 
-enum Operator: CaseIterable {
-   case multiply, add
-   
-   func calculate(_ lhs: Int, _ rhs: Int) -> Int {
-      switch self {
-         case .add:
-            return lhs + rhs
-         case .multiply:
-            return lhs * rhs
+
+let data =
+"""
+............
+........0...
+.....0......
+.......0....
+....0.......
+......A.....
+............
+............
+........A...
+.........A..
+............
+............
+"""
+
+let lines = data.components(separatedBy: .newlines)
+   .map{$0.map{$0}}
+
+let points = (0..<lines.count)
+   .flatMap{ y in
+      (0..<lines.first!.count).map { x in
+         (x, y, lines[y][x])
       }
    }
-}
+   .filter{$0.2 != "."}
 
-func process(_ values: [Int], operators: [Operator] = Operator.allCases) -> [Int] {
-   guard values.count > 1 else {return [values[0]]}
-   
-   return operators.flatMap{ op in
-      let children = process(Array(values.dropLast()))
-      return children.map{ child in
-         op.calculate(child, values.last!)
-      }
-   }
-}
+let grid = Dictionary(grouping: points, by: \.2).mapValues(Point(\.0, \.1) )
 
-process([1,2,3,1]).forEach{print($0)}
+grid
 
+print(grid)
 
-
-
-
-
-
-
-/*
- [123]
- 1+2+3 = 6
- 1+2*3 = 9
- 1*2+3 = 5
- 1*2*3 = 6
- */

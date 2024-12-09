@@ -18,10 +18,18 @@ struct Day07: AdventDay, Sendable {
       // Replace this with your solution for the first part of the day's challenge.
    func part1() async throws -> Int {
       equations
-         .filter{ $0.validate() }
+         .filter{ $0.validate(withOperators: [.add, .multiply]) }
          .map{$0.total}
          .reduce(0, +)
    }
+   
+   func part2() async throws -> Int {
+      equations
+         .filter{ $0.validate(withOperators: [.add, .multiply, .concat]) }
+         .map{$0.total}
+         .reduce(0, +)
+   }
+   
 }
 
 extension Day07 {
@@ -38,15 +46,15 @@ extension Day07 {
             .map{Int($0)!}
       }
       
-      func validate() -> Bool {
-         calculate(values).contains(total)
+      func validate(withOperators operators: [Operator]) -> Bool {
+         calculate(values, operators: operators).contains(total)
       }
       
-      func calculate(_ values: [Int], operators: [Operator] = Operator.allCases) -> [Int] {
+      func calculate(_ values: [Int], operators: [Operator]) -> [Int] {
          guard values.count > 1 else {return [values[0]]}
          
          return operators.flatMap{ op in
-            let children = calculate(Array(values.dropLast()))
+            let children = calculate(Array(values.dropLast()), operators: operators)
             return children.map{ child in
                op.calculate(child, values.last!)
             }
@@ -54,12 +62,14 @@ extension Day07 {
       }
       
       enum Operator: CaseIterable {
-         case multiply, add
+         case multiply, add, concat
          
          func calculate(_ lhs: Int, _ rhs: Int) -> Int {
             switch self {
                case .add: lhs + rhs
                case .multiply: lhs * rhs
+               case .concat:
+                  Int("\(lhs)\(rhs)")!
             }
          }
       }

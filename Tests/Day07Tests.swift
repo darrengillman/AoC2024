@@ -34,7 +34,7 @@
            @Test("Part2 example")
            func testPart2() async throws {
               let result = try await day.part2()
-              #expect(result == 10)
+              #expect(result == 11387)
            }
         }
      }
