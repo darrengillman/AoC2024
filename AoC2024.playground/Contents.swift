@@ -21,7 +21,8 @@ let data =
 ............
 """
 
-let lines = data.components(separatedBy: .newlines)
+let lines = data
+   .components(separatedBy: .newlines)
    .map{$0.map{$0}}
 
 let points = (0..<lines.count)
