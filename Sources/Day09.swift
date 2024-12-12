@@ -23,6 +23,12 @@ struct Day09: AdventDay, Sendable {
       disk.run()
       return disk.checksum
    }
+   
+   func part2() async throws -> Int {
+      var disk = Disk(diskMap: diskMap, blockLevel: false)
+      disk.run()
+      return disk.checksum
+   }
 }
 
    // Add any extra code and types in here to separate it from the required behaviour
@@ -45,6 +51,10 @@ extension Day09 {
       }
    }
    
+   enum Day09Error: Error {
+      case noGapBigEnough
+   }
+   
    struct Disk {
       var blockLevel: Bool
       var blockFilesystem: [Block]
@@ -65,7 +75,21 @@ extension Day09 {
             }
       }
       
-      private var fileChecksum: Int {0}
+      private var fileChecksum: Int {
+         let flattened = documentFileSystem
+            .flatMap {entry in
+               switch entry  {
+                  case let .free(size): return Array(repeating: 0, count: size)
+                  case let .file(id, size): return Array(repeating: id, count: size)
+               }
+            }
+         
+         return flattened
+            .indices
+            .reduce(0) { sum, index in
+               sum + index * flattened[index]
+            }
+      }
       
       
       init(diskMap: [Int], blockLevel: Bool = true) {
@@ -103,7 +127,7 @@ extension Day09 {
          }
       }
       
-      mutating func fileRun() {
+      mutating private func fileRun() {
          var lastFileProcessed: Int?
          
          var lastFileIndex: Int {
@@ -118,21 +142,62 @@ extension Day09 {
          }
          
          while lastFileIndex != documentFileSystem.startIndex {
-            let file = documentFileSystem[lastFileIndex]
+            guard case let .file(id, fileSize) = documentFileSystem[lastFileIndex] else { break }
+            
+            guard let freeRange = try? firstGapOf(fileSize, in: documentFileSystem, before: lastFileIndex) else {
+               lastFileProcessed = id
+               continue
+            }
+            
+            let totalFree = freeRange
+               .map{documentFileSystem[$0].size}
+               .reduce(0, +)
+            
+            documentFileSystem[lastFileIndex] = .free(size: fileSize)
+            documentFileSystem.removeSubrange(freeRange)
+            
+            if totalFree > fileSize {
+               documentFileSystem.insert(.free(size: totalFree - fileSize), at: freeRange.lowerBound)
+            }
+            
+            documentFileSystem.insert(.file(id: id, size: fileSize), at: freeRange.lowerBound)
+            lastFileProcessed = id
          }
-         
-         
       }
       
+      private func firstGapOf(_ requiredGap: Int, in diskMap: [Entry], before: Int) throws -> Range<Int> {
+         var i = diskMap.startIndex
+         var start = 0
+         var spaces = 0
+         var j = 0
+         
+         while i < before {
+            if case .file = diskMap[i] {
+               i += 1
+            } else {
+               spaces = 0
+               j = 0
+               start = i
+               while i+j < before, spaces < requiredGap,  case .free(let size) = diskMap[i+j] {
+                  spaces += size
+                  j += 1
+               }
+               i = i + j
+            }
+            if spaces >= requiredGap {
+               return start..<i
+            }
+         }
+         throw Day09Error.noGapBigEnough
+      }
       
+      mutating func step(nextFreeIndex: Int, lastFileIndex: Int) {
+         if blockLevel {
+            blockStep(nextFreeIndex: nextFreeIndex, lastFileIndex: lastFileIndex)
+         }
+      }
       
-      
-      
-      
-      
-      
-      
-      mutating func blockRun() {
+      mutating private func blockRun() {
          var lastFileIndex: Int { blockFilesystem.lastIndex(where: { block in
             if case .file = block { true } else { false }
          } ) ?? blockFilesystem.startIndex
@@ -148,7 +213,7 @@ extension Day09 {
          }
       }
       
-      mutating func blockStep(nextFreeIndex: Int, lastFileIndex: Int) {
+      mutating private func blockStep(nextFreeIndex: Int, lastFileIndex: Int) {
          blockFilesystem[nextFreeIndex] = blockFilesystem[lastFileIndex]
          blockFilesystem[lastFileIndex] = .free
       }

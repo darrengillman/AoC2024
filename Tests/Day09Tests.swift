@@ -41,13 +41,6 @@ struct Day09Tests {
          #expect(disk.blockFilesystem == expected)
       }
       
-      @Test("Single Step")
-      mutating func testSingleStep() {
-         disk.step()
-         let expected = "02.111....2222."
-         #expect(disk.blockFilesystem.description == expected)
-      }
-      
       @Test("Full run")
       mutating func testFullSimpleRun() {
          disk.run()
@@ -80,10 +73,8 @@ struct Day09Tests {
          
          @Test("Part2 example")
          func testPart2() async throws {
-            await withKnownIssue {
                let result = try await day.part2()
-               #expect(result == 10)
-            }
+               #expect(result == 2858)
          }
       }
    }
