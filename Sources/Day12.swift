@@ -3,13 +3,15 @@ import Collections
 
 struct Day12: AdventDay, Sendable {
   // Save your data in a corresponding text file in the `Data` directory.
-  let day = 0
-  let puzzleName: String = "--- Day 0: Placeholder! ---"
+   let day = 12
+   let puzzleName: String = "--- Day 12 ---"
    var grid: [Point: Character] = [:]
    let xRange: ClosedRange<Int>
    let yRange: ClosedRange<Int>
-
-  init(data: String) {
+   
+   let visited = Visited()
+   
+   init(data: String) {
      grid = data
         .trimmingCharacters(in: .whitespaces)
         .components(separatedBy: .newlines)
@@ -29,14 +31,12 @@ struct Day12: AdventDay, Sendable {
 
       // Replace this with your solution for the first part of the day's challenge.
    func part1() async throws -> Int {
+      var grid = grid
       var regions: Set<Region> = []
-      var toExplore: Set<Point> = [Point(0,0)]
-      var explored: Set<Point> = []
-      while let current = toExplore.popFirst() {
-         let region = region(for: current, target: grid[current]!)
-         regions.insert(Region(char: grid[current]!, points: region.inside))
-         explored.formUnion(region.inside)
-         toExplore.formUnion(region.outside.subtracting(explored))
+      while let current = grid.popFirst() {
+         let matched = await region(for: current.key, target: current.value)
+         regions.insert(Region(char: current.value, points: matched))
+         matched.forEach{grid[$0] = nil}
       }
       let cost = regions.reduce(0){$0 + $1.cost}
       return cost
@@ -70,26 +70,28 @@ extension Day12 {
             .count
       }
    }
-   
-   func region(for point: Point, target: Character, visited: Set<Point> = []) -> (inside: Set<Point>, outside: Set<Point>) {
-      guard grid[point] == target else {return ([], [point])}
-      var excluded = Set<Point>()
+   @MainActor
+   func region(for point: Point, target: Character) ->  Set<Point> {
+      guard grid[point] == target else {return ([])}
+      visited.add(point)
       let unvisitedNeighbours = point
-         .neighbours(inX: xRange, y: yRange)
-         .filter{!(visited.union([point])).contains($0)}
-      let updatedVisited = visited.union([point])
+         .neighbours
+         .filter{grid[$0] != nil}
+         .filter{!visited.points.contains($0)}
       let results = unvisitedNeighbours
-         .reduce( (inside: Set([point]), outside: Set<Point>()) ) { sets, point in
-            let processed = region(for: point, target: target, visited: updatedVisited)
-            let inside = processed.inside.subtracting(excluded)
-            excluded.formUnion(processed.outside)
-            
-            return (
-               sets.inside.union(inside),
-               sets.outside.union(processed.outside)
-            )
+         .reduce( Set([point]) ) { set, point in
+            set.union( region(for: point, target: target))
          }
       return results
+   }
+}
+
+@MainActor
+class Visited: Sendable {
+   var points: Set<Point> = []
+   
+   func add(_ point: Point) {
+      points.insert(point)
    }
 }
 
@@ -99,14 +101,13 @@ extension Point: CustomStringConvertible {
    }
    
    var description: String {"(\(x), \(y))"}
-   func neighbours(inX xRange: ClosedRange<Int>, y yRange: ClosedRange<Int>) -> [Point] {
+   var neighbours: [Point] {
       [
-         .init(self.x - 1, self.y),
-         .init(self.x + 1, self.y),
+         .init(self.x-1, self.y),
+         .init(self.x+1, self.y),
          .init(self.x, self.y+1),
          .init(self.x, self.y-1)
       ]
-         .filter{xRange ~= $0.x && yRange ~= $0.y}
    }
    
    var edges: [Edge] {
