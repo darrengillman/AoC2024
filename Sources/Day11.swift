@@ -1,7 +1,9 @@
 import Foundation
+typealias Stone = Int
+//Part2:  747,984 is too low
+
 
 struct Day11: AdventDay, Sendable {
-   typealias Stone = Int
       // Save your data in a corresponding text file in the `Data` directory.
    let day = 11
    let puzzleName: String = "--- Day 11 ---"
@@ -34,7 +36,7 @@ extension Day11 {
    
    
    struct Line {
-      var memos: [[Stone: [Stone]] = [:]
+      var memos: [Stone: [Stone]] = [:]
       var stones: [Stone]
       let loops: Int
       
@@ -46,6 +48,7 @@ extension Day11 {
       mutating func run() -> Int {
          for _ in 0..<loops {
             stones = blink(on: stones)
+            print(stones)
          }
          
          return stones.count
@@ -53,30 +56,34 @@ extension Day11 {
       
       mutating func blink(on stones: [Stone]) -> [Stone] {
          stones
-            .chunks(ofCount: 20)
-            .flatMap { chunk in
-               let input = chunk.map{$0}
-               if let prev = memos[input]  {
-                  return prev
-               }
-               else
-               {
-                  let blinked = chunk
-                     .flatMap{process($0)}
-                  memos[input] = blinked
-                  return blinked
-               }
+            .flatMap {
+               process($0)
             }
       }
       
-      func process(_ stone: Stone) -> [Stone] {
-         switch stone {
-            case 0: return [1]
-            case let i where String(i).count.isMultiple(of: 2):
-               let s = String(i)
-               return [s.prefix(s.count/2).asString, s.suffix(s.count/2).asString].compactMap(Int.init)
-            default: return[ stone * 2024]
+      mutating func process(_ stone: Stone) -> [Stone] {
+         if let memo = memos[stone] {
+               //            print(">",memo)
+            return memo
+         } else {
+            let processed = switch stone {
+               case 0: [1]
+               case let i where String(i).count.isMultiple(of: 2):
+                  [String(i).prefix(String(i).count/2).asString, String(i).suffix(String(i).count/2).asString].compactMap(Int.init)
+               default: [ stone * 2024]
+            }
+            memos[stone] = processed
+               //            print(processed)
+            return processed
          }
       }
+   }
+}
+   
+
+
+fileprivate extension Sequence where Element == Stone {
+   var asArray: [Element] {
+      Array(self)
    }
 }

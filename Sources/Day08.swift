@@ -112,7 +112,7 @@ extension Day08 {
    }
 }
 
-extension Sequence {
+fileprivate extension Sequence {
    func asArray() -> [Self.Element]  {
       Array(self)
    }
