@@ -39,13 +39,34 @@
           let result = try await day1.part1()
           #expect(result == 1930)
       }
+       @Test("1 x 4 Region")
+       func test4x1Region() {
+          let points: Set<Point> = [.init(2,2), .init(3,2), .init(4, 2), .init(5, 2)]
+          var plotter = Plotter(points: points)
+          let edges = plotter.countRuns()
+          #expect(edges == 4)
+       }
+       
+       @Test("2 x 4 Region")
+       func test2x4Region() {
+          let points: Set<Point> = [.init(2,2), .init(3,2), .init(4, 2), .init(5, 2), .init(2,3), .init(3,3), .init(4, 3), .init(5, 3)]
+          var plotter = Plotter(points: points)
+          let edges = plotter.countRuns()
+          #expect(edges == 4)
+       }
+       
+       @Test("L Region")
+       func testLRegion() {
+          let points: Set<Point> = [.init(2,2), .init(3,2), .init(4, 2), .init(5, 2), .init(5,3), .init(5,4), .init(5,5), .init(5, 6)]
+          var plotter = Plotter(points: points)
+          let edges = plotter.countRuns()
+          #expect(edges == 6)
+      }
 
       @Test("Part2 example")
       func testPart2() async throws {
-        await withKnownIssue {
           let result = try await day.part2()
           #expect(result == 10)
-        }
       }
     }
   }

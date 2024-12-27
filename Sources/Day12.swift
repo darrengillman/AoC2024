@@ -2,7 +2,7 @@ import Foundation
 import Collections
 
 struct Day12: AdventDay, Sendable {
-  // Save your data in a corresponding text file in the `Data` directory.
+      // Save your data in a corresponding text file in the `Data` directory.
    let day = 12
    let puzzleName: String = "--- Day 12 ---"
    var grid: [Point: Character] = [:]
@@ -12,23 +12,23 @@ struct Day12: AdventDay, Sendable {
    let visited = Visited()
    
    init(data: String) {
-     grid = data
-        .trimmingCharacters(in: .whitespaces)
-        .components(separatedBy: .newlines)
-        .filter{!$0.isEmpty}
-        .map{$0.map{$0}}
-        .enumerated()
-        .reduce(into: [Point:Character]()){dict, enumerated in
-           enumerated.element
-              .enumerated()
-              .forEach{ x, char in
-                 dict[Point(x,enumerated.offset)] = char
-              }
-        }
-     xRange = 0...grid.keys.map(\.x).max()!
-     yRange = 0...grid.keys.map(\.y).max()!
-  }
-
+      grid = data
+         .trimmingCharacters(in: .whitespaces)
+         .components(separatedBy: .newlines)
+         .filter{!$0.isEmpty}
+         .map{$0.map{$0}}
+         .enumerated()
+         .reduce(into: [Point:Character]()){dict, enumerated in
+            enumerated.element
+               .enumerated()
+               .forEach{ x, char in
+                  dict[Point(x,enumerated.offset)] = char
+               }
+         }
+      xRange = 0...grid.keys.map(\.x).max()!
+      yRange = 0...grid.keys.map(\.y).max()!
+   }
+   
       // Replace this with your solution for the first part of the day's challenge.
    func part1() async throws -> Int {
       var grid = grid
@@ -40,36 +40,11 @@ struct Day12: AdventDay, Sendable {
       }
       let cost = regions.reduce(0){$0 + $1.cost}
       return cost
-  }
+   }
 }
 
-// Add any extra code and types in here to separate it from the required behaviour
+   // Add any extra code and types in here to separate it from the required behaviour
 extension Day12 {
-   
-   struct Region: Hashable {
-      let char: Character
-      let points: Set<Point>
-      
-      var cost: Int {
-         area * perimeter
-      }
-      
-      private var area: Int {points.count}
-      
-      private var edges: NSCountedSet {
-         points.reduce(into: NSCountedSet()) { cSet, point in
-            point.edges.forEach{cSet.add($0)}
-         }
-      }
-      
-      private var perimeter: Int {
-         edges
-            .map{(($0, edges.count(for: $0)))}
-            .filter{$0.1 == 1}
-            .map{$0.0}
-            .count
-      }
-   }
    @MainActor
    func region(for point: Point, target: Character) ->  Set<Point> {
       guard grid[point] == target else {return ([])}
@@ -86,6 +61,130 @@ extension Day12 {
    }
 }
 
+enum Direction: CaseIterable {
+   case U, R, D, L
+}
+
+struct Plotter: Hashable {
+   var turns = 0
+   let start: Point
+   var current: Point
+   var heading: Direction = .R
+   var looking: Direction {
+      switch heading {
+         case .U: .R
+         case .R: .D
+         case .D: .L
+         case .L: .U
+      }
+   }
+   let points: Set<Point>
+   
+   init(points: Set<Point>) {
+      self.points = points
+      let top = points.map(\.y).min()!
+      let left = points.filter{$0.y == top}.map(\.x).min()!
+      start = Point(left, top-1)
+      current = start
+   }
+   
+   mutating func countRuns() -> Int {
+      while current != start || turns == 0 {
+         print(current)
+         if let next = try? forwardOne(from: current) {
+               // space ahead to move into
+            current = next
+            if !edge(looking: looking, from: current) {
+                  //nothing there, i.e. the wall has turned R
+               heading = turn(.R, from: heading)
+               turns += 1
+            }
+         } else {
+               //can't move forward as point in the way, so turn L & try again
+            heading = turn(.L, from: heading)
+            turns += 1
+         }
+      }
+      return turns
+   }
+   
+   private func turn(_ turning: Direction, from heading: Direction) -> Direction {
+      switch (heading, turning) {
+         case (.U, .L): .L
+         case (.R, .L): .U
+         case (.D, .L): .R
+         case (.L, .L): .D
+            
+         case (.U, .R): .R
+         case (.R, .R): .D
+         case (.D, .R): .L
+         case (.L, .R): .U
+            
+         default: fatalError("Can't turn \(turning)")
+            
+      }
+   }
+   
+   private func forwardOne(from point: Point) throws -> Point {
+      let next = point.next(heading: heading)
+      guard !points.contains(next) else {throw PlotterError.wayForwardBlocked}
+      return next
+   }
+   
+   private func edge(looking direction: Direction, from point: Point) -> Bool {
+      let lookingAt = point.next(heading: direction)
+      return points.contains(lookingAt)
+   }
+   
+   enum PlotterError: Error {
+      case wayForwardBlocked
+   }
+   
+   
+}
+
+fileprivate struct Region: Hashable {
+   internal init(char: Character, points: Set<Point>) {
+      self.char = char
+      self.points = points
+   }
+   
+   func hash(into hasher: inout Hasher) {
+      hasher.combine(char)
+      hasher.combine(points)
+   }
+   
+   let char: Character
+   let points: Set<Point>
+   
+   var cost: Int { area * perimeter }
+   
+   var bulkCost: Int {runs * area}
+   
+   private var area: Int {points.count}
+   
+   private var runs: Int {
+      var plotter = Plotter(points: points)
+      let runs = plotter.countRuns()
+      return runs
+   }
+   
+   
+   private var edges: NSCountedSet {
+      points.reduce(into: NSCountedSet()) { cSet, point in
+         point.edges.forEach{cSet.add($0)}
+      }
+   }
+   
+   private var perimeter: Int {
+      edges
+         .map{(($0, edges.count(for: $0)))}
+         .filter{$0.1 == 1}
+         .map{$0.0}
+         .count
+   }
+}
+
 @MainActor
 class Visited: Sendable {
    var points: Set<Point> = []
@@ -94,6 +193,7 @@ class Visited: Sendable {
       points.insert(point)
    }
 }
+
 
 extension Point: CustomStringConvertible {
    struct Edge: Hashable {
@@ -117,5 +217,14 @@ extension Point: CustomStringConvertible {
          .init(start: Point(self.x+1, self.y), end: Point(self.x+1, self.y+1)),
          .init(start: Point(self.x, self.y+1), end: Point(self.x+1, self.y+1)),
       ]
+   }
+   
+   fileprivate func next(heading direction: Direction, step: Int = 1) -> Point {
+      switch direction {
+         case .U: .init(x, y-step)
+         case .R: .init(x+step, y)
+         case .D: .init(x, y+step)
+         case .L: .init(x-step, y)
+      }
    }
 }
