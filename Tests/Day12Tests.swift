@@ -26,47 +26,71 @@
     @Suite("Tests on sample inputs")
     struct SolutionsTests {
       let day = Day12(data: testInput)
-      let day1 = Day12(data: testInput1)
+//      let day1 = Day12(data: testInput1)
 
       @Test("Part1 example")
       func testPart1() async throws {
           let result = try await day.part1()
           #expect(result == 1930)
       }
-
-       @Test("Part1A example")
-      func testPart1A() async throws {
-          let result = try await day1.part1()
-          #expect(result == 1930)
-      }
-       @Test("1 x 4 Region")
-       func test4x1Region() {
-          let points: Set<Point> = [.init(2,2), .init(3,2), .init(4, 2), .init(5, 2)]
-          var plotter = Plotter(points: points)
-          let edges = plotter.countRuns()
-          #expect(edges == 4)
+       
+       //Part 2
+       
+       @Test("Inner regions")
+       func testInnerRegions() async {
+          let dayD = Day12(data: testInputD)
+          let result = try! await dayD.part2()
+          print(result)
+          #expect(result == 368)
        }
        
-       @Test("2 x 4 Region")
-       func test2x4Region() {
-          let points: Set<Point> = [.init(2,2), .init(3,2), .init(4, 2), .init(5, 2), .init(2,3), .init(3,3), .init(4, 3), .init(5, 3)]
-          var plotter = Plotter(points: points)
-          let edges = plotter.countRuns()
-          #expect(edges == 4)
-       }
-       
-       @Test("L Region")
-       func testLRegion() {
-          let points: Set<Point> = [.init(2,2), .init(3,2), .init(4, 2), .init(5, 2), .init(5,3), .init(5,4), .init(5,5), .init(5, 6)]
-          var plotter = Plotter(points: points)
-          let edges = plotter.countRuns()
-          #expect(edges == 6)
-      }
+       @Test("Single Inner regions")
+       func testSingleInnerRegions() async {
+          let testDay = Day12(data: testInputE)
+          let result = try! await testDay.part2()
+          print(result)
 
-      @Test("Part2 example")
+          #expect(result == 68)
+       }
+
+        
+       @Test("Input A")
+       func testA() async {
+          let testDay = Day12(data: testInputA)
+          let result = try! await testDay.part2()
+          print(result)
+
+          #expect(result == 80)
+       }
+
+        
+       @Test("Input B")
+       func testB() async {
+          let testDay = Day12(data: testInputB)
+          let result = try! await testDay.part2()
+          print(result)
+
+          #expect(result == 436)
+       }
+
+         
+       @Test("Input C")
+       func testC() async {
+          let testDay = Day12(data: testInputC)
+          let result = try! await testDay.part2()
+          print(result)
+
+          #expect(result == 236)
+       }
+
+   
+       
+       @Test("Part2 example")
       func testPart2() async throws {
           let result = try await day.part2()
-          #expect(result == 10)
+         print(result)
+
+          #expect(result == 1206)
       }
     }
   }
@@ -86,23 +110,49 @@ MIIISIJEEE
 MMMISSJEEE
 """
 
-private let testInput1 =
+private let testInputA =
 """
-YYYYYYYYYEJJEEEEEEEEEEEEEEGGGGGGGGGGGGGGGGGGCCCCCCCCCCWWCCLLLKKKKJKKKKKKFFFFFFFBBBBBBBBBBBAEEEEEEEEEEEEPPPPPPPPPOOOOZYYYZZZZZZAAUUUUUUUUUUUU
-YYYYYYYYNEEEEEEEEEEEEEEEEEGGGGGGGGGGGGGGGGGCCCCCCCCCCCCCCCLLLLKKKKKKKKKKKFFFFFBBFBOBBBBBBBBBEEEEEEEEEEEPPPPPPOOOOOOOZZZZZZZZZZZAAUKUUUUUUUUU
-YYYYYYNNNNYEEEEEEEEEEEEEEEGGGGGGGGGGGGGGGGGGCCCCCCCCCCCCCCCCLKKKKKKKKKKKKFFFFFFFFBBBBBBBBBBBBEEEEEEEEPPPPPPPOOOOOOOOOZZZZZZZZZUUUUUUUUUUUUUU
-YYYNNNNNNNEEEEEEEEEEEEEEEEEGGGGGGGGGGGGGGGVVVVCCCCCCCCCRREEEEKKKKKKKKKKKKFFFFFFXFBBBBBBMMBBBBBEEEEEFEPPPPPPOOOOOOOOOOOZZZZZZZZZZUUUUUUUUUUUU
-YYYNNNNNNWWEEEEEEEEEEEEEEEEGGGGGGGGGGGGGGGWVVVVVCCCCCCRRREEMEEKKKKKKKKKKKFFFFFXXFFBBBMBMMEEEEEEEEEEEPPPPPPPOOOOOOOOOOOZZZZZZZZZUUUUUUUUUUUUU
-YYNNNNNNNNEEEEEEEEEEEEEEEEEEIIIIGGGGGGGGGWWWVVVVVCCCCCCEEEEMEKKKKKKKKKKKKKFFFFXXXBBBMMMMMEEEEEEEEEEEPPPPPPPPOOOOOOOOOOOOZZZZUUZUUUUUUUUUUUUU
-YNNNNNNNNNNEEEEEEEEEEEEEEEEEIIIIGGGGGGGWWWWVVVVWWWWCWCCWEEMMMKKKKKKKKKKKKKFFFFXXXXXXMMMMEEEEEEEEEEEPPPPHHHHPPOOOOOOOOOOOZZZUUUUUUUUUUUUUUUUN
-NNNNNNNNNNNNEEKEEKKKVEEEEEEIIIIIGIGGVGGGWCWWWWVVVWWWWCWWMMMMKKKKKKKKKKKKKKXXXXXXXXXXMMMMMEEEEEEEEEEPPHHHHHHPPOOOOOOOOOOOZZZUUUUUUUUUUUUUUUUN
-NNNNNNNNNNNNAKKKKKKKKEEEEEEIIIIIIIGVVGGGWCCWWWWWWWWWWWWWWMMMMMMBBBKKKKBKKKBBXXXXXXXXMMXMMMEMMEEEEEQCPCHHHHHHPPOOOVVVOOOOZOOOOUUUUUUUUUUUUUNN
-JJNNNNNNNNNNNKKKKKKKKEEEETTTTTTTTTGGGGGGCCCWWWWMWMMWWWWWWWMMMMMMMBBBKBBBKBBBBXXXXXXXXXXMMMMMMEEEQQQCCCHHHHHHHPVOOVVVOVOOOOOOOOOUUUUUUUUUUNNN
-JJNNJNNNNNNJKKKKKKKKKKEEETTTTTTTTTTTIGGGCCCCWWWMMMMMWWWWWWWWWWMMKVBBBBNBBBBBBXXXXXXXXXXMMMMMMEEQQYQCCCHHHHHHHVVOOVVVVVOOOOOOOOOOUUQQUUUUNNNN
-JJNNJNNNJJJJJKKKKKKKKKKKZTTTTTTTTTTTTTCGCCCCWWWMMMMMWWWWWWWWWWMVKVBBBNNNNBBBBXXXXXXBXNMMMMMMMMHQQQQCCCCHHHHHVVVHVVVVVVVVOOOFFFOOQQQQUNNNNNNN
-JJJJJNNNJJJJJJKKKKKKKKKZZTTTTTTTTTTTTTCCCCCCCWMMMMWWWWWWWVWWVVVVVVBBBNXNNNNBBBBXXBBBMMMMMMMMMQQQQQQCCCCHHHHHHVVHVVVVVVVVOFFFFFOOQQQQUQNNNNNN
-JJJJJNIJJJJJKKKKKKKKKKKKZZZZITTTTTTTTTCCCCCCCCMMMMWWWWWWVVVVVVVVVVVBVNNNNNNNBBBBXBBBBBMMMMMMMKQQQQQQCQCHHHHHHVVVVVVVVVVVVFFFFFOQQQQQQQQNNNNN
-JJJJJJJJJJJJJKKKKKKKKKKKZLZZZTTTTTTTTTCCCCCCCCMMMMMMMWVWVVVVVVVVVVVVVNNNNNNNBBBBXBBBBBMMMMMMMQQQQQQQQQHHHHHMHHZVVVVVVVVVVVFFQOOOQQQQQQNNNNNN
-JJJJJJJJJJCCCKVKKKKKKKZZZLLLLZZCTTTTCCCCCCCCCCMMMMMMMMVVVVVVVVVVVVVVNNNNNNRRRRRBBBBBMMRRRMMMMMQQQQQQQQMMMXMMMHVVVVVVVVVVVVQQQQQOOOQQQQNNNNNN
-JJJJJJJJJJCCCCKKKKKKKZZZLLLLCCCCTTTTTTTTTCCLLMMMMMMMMMTVVVVVVVVVVVVVNNNNNNRRRRRRRBBBMMMMRMMMMQQQQQQQQQMMMMMMMEMVVVVVVVVVVVQQQHQQQQQQQQNNNNNN
+AAAA
+BBCD
+BBCC
+EEEC
+"""
+//80
+
+private let testInputB =
+"""
+OOOOO
+OXOXO
+OOOOO
+OXOXO
+OOOOO
+"""
+//436
+private let testInputC =
+"""
+EEEEE
+EXXXX
+EEEEE
+EXXXX
+EEEEE
+"""
+//E shaped = 17a 12s -> 204
+//incl Xs 236
+
+private let testInputD =
+"""
+AAAAAA
+AAABBA
+AAABBA
+ABBAAA
+ABBAAA
+AAAAAA
+"""
+//368 - A's have inner boundaries around the Bs
+
+private let testInputE =
+"""
+AAA
+AUA
+AAA
 """

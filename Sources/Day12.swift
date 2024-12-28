@@ -5,7 +5,7 @@ struct Day12: AdventDay, Sendable {
       // Save your data in a corresponding text file in the `Data` directory.
    let day = 12
    let puzzleName: String = "--- Day 12 ---"
-   var grid: [Point: Character] = [:]
+   let grid: [Point: Character]
    let xRange: ClosedRange<Int>
    let yRange: ClosedRange<Int>
    
@@ -31,20 +31,50 @@ struct Day12: AdventDay, Sendable {
    
       // Replace this with your solution for the first part of the day's challenge.
    func part1() async throws -> Int {
-      var grid = grid
+      var part1Grid = grid
       var regions: Set<Region> = []
-      while let current = grid.popFirst() {
+      while let current = part1Grid.popFirst() {
          let matched = await region(for: current.key, target: current.value)
          regions.insert(Region(char: current.value, points: matched))
-         matched.forEach{grid[$0] = nil}
+         matched.forEach{part1Grid[$0] = nil}
       }
       let cost = regions.reduce(0){$0 + $1.cost}
       return cost
+   }
+   
+   func part2() async throws -> Int {
+      await visited.reset()
+      var part2Grid = grid
+      var part2Regions: Set<Region> = []
+      while let current = part2Grid.popFirst() {
+         let matched = await region(for: current.key, target: current.value)
+         part2Regions.insert(Region(char: current.value, points: matched))
+         matched.forEach{part2Grid[$0] = nil}
+      }
+      let results = part2Regions.map{$0.sides}
+      
+      let costs = results.map { result in
+         if let outer = part2Regions.first(where: {region in  result.boundary.isSubset(of: region.points)}) {
+            return result.area! * result.sides + outer.area * result.sides
+         } else {
+            return result.area! * result.sides
+         }
+      }
+      
+      let bulkCost = costs.reduce(0,+)
+            
+      return bulkCost
    }
 }
 
    // Add any extra code and types in here to separate it from the required behaviour
 extension Day12 {
+   struct SidesResult {
+      let area: Int?
+      let sides: Int
+      let boundary: Set<Point>
+   }
+   
    @MainActor
    func region(for point: Point, target: Character) ->  Set<Point> {
       guard grid[point] == target else {return ([])}
@@ -88,9 +118,9 @@ struct Plotter: Hashable {
       current = start
    }
    
-   mutating func countRuns() -> Int {
+   mutating func countRuns() -> Day12.SidesResult {
+      var boundary: Set<Point> = []
       while current != start || turns == 0 {
-         print(current)
          if let next = try? forwardOne(from: current) {
                // space ahead to move into
             current = next
@@ -98,6 +128,8 @@ struct Plotter: Hashable {
                   //nothing there, i.e. the wall has turned R
                heading = turn(.R, from: heading)
                turns += 1
+            } else {
+               boundary.insert(current)
             }
          } else {
                //can't move forward as point in the way, so turn L & try again
@@ -105,7 +137,7 @@ struct Plotter: Hashable {
             turns += 1
          }
       }
-      return turns
+      return Day12.SidesResult(area: nil, sides: turns, boundary: boundary)
    }
    
    private func turn(_ turning: Direction, from heading: Direction) -> Direction {
@@ -121,7 +153,6 @@ struct Plotter: Hashable {
          case (.L, .R): .U
             
          default: fatalError("Can't turn \(turning)")
-            
       }
    }
    
@@ -139,8 +170,6 @@ struct Plotter: Hashable {
    enum PlotterError: Error {
       case wayForwardBlocked
    }
-   
-   
 }
 
 fileprivate struct Region: Hashable {
@@ -156,19 +185,14 @@ fileprivate struct Region: Hashable {
    
    let char: Character
    let points: Set<Point>
-   
    var cost: Int { area * perimeter }
+   var area: Int {points.count}
    
-   var bulkCost: Int {runs * area}
-   
-   private var area: Int {points.count}
-   
-   private var runs: Int {
+   var sides: Day12.SidesResult {
       var plotter = Plotter(points: points)
       let runs = plotter.countRuns()
-      return runs
+      return .init(area: area, sides: runs.sides, boundary: runs.boundary)
    }
-   
    
    private var edges: NSCountedSet {
       points.reduce(into: NSCountedSet()) { cSet, point in
@@ -191,6 +215,10 @@ class Visited: Sendable {
    
    func add(_ point: Point) {
       points.insert(point)
+   }
+   
+   func reset() {
+      points = []
    }
 }
 
