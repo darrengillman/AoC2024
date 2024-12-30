@@ -114,7 +114,7 @@ struct Day13Tests {
          @Test("Part1 example")
          func testPart1() async throws {
                let result = try await day.part1()
-               #expect(result == 10)
+               #expect(result == 480)
          }
          
          @Test("Part2 example")

@@ -13,19 +13,17 @@ struct Day13: AdventDay, Sendable {
 
   // Replace this with your solution for the first part of the day's challenge.
   func part1() async throws -> Int {
-     /*
-      A = (p_x*b_y - prize_y*b_x) / (a_x*b_y - a_y*b_x)
-      B = (a_x*p_y - a_y*p_x) / (a_x*b_y - a_y*b_x)
-      
-      */
-     
-     let machines = machines(from: data)
-     
-     
-     return machines.count
-     
-   
+     machines(from: data)
+        .compactMap{grabberMoves(for: $0, offset: 0)}
+        .reduce(0,+)
   }
+   
+   func part2() async throws -> Int {
+      machines(from: data)
+         .compactMap{grabberMoves(for: $0, offset: 10000000000000)}
+         .reduce(0,+)
+   }
+
 }
 
 // Add any extra code and types in here to separate it from the required behaviour
@@ -35,7 +33,6 @@ extension Day13 {
       let buttonB: Point
       let prize: Point
    }
-   
    
    func machines(from data: String) -> [Machine] {
       let buttonA = Regex {
@@ -94,8 +91,22 @@ extension Day13 {
       return data
          .matches(of: regex)
          .map{
-            Machine(buttonA: .init($0.1, $0.2), buttonB: Point.init($0.3, $0.3), prize: .init($0.4, $0.5))
+            Machine(buttonA: .init($0.1, $0.2), buttonB: Point.init($0.3, $0.4), prize: .init($0.5, $0.6))
          }
+   }
+   
+   func grabberMoves(for machine: Machine, offset: Int) -> Int?  {
+      let prize = machine.prize + Point(offset, offset)
+      //Cramer's rule
+      let det = machine.buttonA.x * machine.buttonB.y - machine.buttonA.y * machine.buttonB.x
+      let a = (prize.x * machine.buttonB.y - prize.y * machine.buttonB.x) / det
+      let b = (machine.buttonA.x * prize.y - machine.buttonA.y * prize.x) / det
+      
+      if (machine.buttonA.x * a + machine.buttonB.x * b, machine.buttonA.y * a + machine.buttonB.y * b) == (prize.x, prize.y) {
+         return a * 3 + b
+      } else {
+         return nil
+      }
    }
 }
 
