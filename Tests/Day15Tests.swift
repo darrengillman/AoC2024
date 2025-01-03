@@ -8,7 +8,7 @@
   struct ParserTests {
     @Test("Test parser implementation")
     func parseInput() {
-       let game = Day15.parse(input: testInput)
+       let game = Day15.parse(input: testInput2)
        #expect(game.grid.keys.count == 100)
        #expect(game.moves.count == 70)
        
@@ -19,28 +19,48 @@
   struct SolutionsTests {
     @Suite("Tests on sample inputs")
     struct SolutionsTests {
-      let day = Day15(data: testInput)
+      let day1 = Day15(data: testInput1)
+       let day2 = Day15(data: testInput2)
 
-      @Test("Part1 example")
-      func testPart1() async throws {
-        await withKnownIssue {
-          let result = try await day.part1()
-          #expect(result == 10)
-        }
+      @Test("Part1 example A")
+      func testPart1A() async throws {
+          let result = try await day1.part1()
+          #expect(result == 2028)
       }
+       
+       @Test("Part1 example B")
+       func testPart1B() async throws {
+          let result = try await day2.part1()
+          #expect(result == 10092)
+       }
 
-      @Test("Part2 example")
-      func testPart2() async throws {
-        await withKnownIssue {
-          let result = try await day.part2()
-          #expect(result == 10)
-        }
-      }
+//      @Test("Part2 example")
+//      func testPart2() async throws {
+//        await withKnownIssue {
+//          let result = try await day1.part2()
+//          #expect(result == 10)
+//        }
+//      }
     }
   }
 }
 
-private let testInput =
+
+private let testInput1 =
+"""
+  ########
+  #..O.O.#
+  ##@.O..#
+  #...O..#
+  #.#.O..#
+  #...O..#
+  #......#
+  ########
+  
+  <^^>>>vv<v>>v<<
+  """
+
+private let testInput2 =
   """
   ##########
   #..O..O.O#
