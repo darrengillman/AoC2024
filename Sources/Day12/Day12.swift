@@ -91,9 +91,7 @@ extension Day12 {
    }
 }
 
-enum Direction: CaseIterable {
-   case U, R, D, L
-}
+
 
 struct Plotter: Hashable {
    var turns = 0
@@ -223,21 +221,11 @@ class Visited: Sendable {
 }
 
 
-extension Point: CustomStringConvertible {
+extension Point {
    struct Edge: Hashable {
       var start, end: Point
    }
-   
-   var description: String {"(\(x), \(y))"}
-   var neighbours: [Point] {
-      [
-         .init(self.x-1, self.y),
-         .init(self.x+1, self.y),
-         .init(self.x, self.y+1),
-         .init(self.x, self.y-1)
-      ]
-   }
-   
+      
    var edges: [Edge] {
       [
          .init(start: self, end: Point(self.x+1, self.y)),

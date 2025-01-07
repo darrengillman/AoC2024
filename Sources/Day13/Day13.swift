@@ -110,11 +110,3 @@ extension Day13 {
    }
 }
 
-extension Point {
-   static func + (lhs: Point, rhs: Point) -> Point {
-      Point(
-         lhs.x + rhs.x,
-         lhs.y + rhs.y
-      )
-   }
-}
