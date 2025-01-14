@@ -9,14 +9,36 @@ enum Direction: CaseIterable {
 }
 
 extension Dictionary where Key == Point, Value: CustomStringConvertible {
+   
    func print() {
-      guard let maxY = self.keys.map(\.y).max()else {return}
+      Swift.print(self.render())
+   }
+   
+   func render() -> String {
+      var lines: [String] = []
+      guard let maxY = self.keys.map(\.y).max()else {return ""}
       for y in 0...maxY {
-         let line = self.filter{$0.key.y == y}.sorted{$0.key.x < $1.key.x}.map(\.value.description).joined()
-         Swift.print(line)
+         guard let maxX = self.keys.filter({$0.y == y}).map(\.x).max() else {continue}
+         var line = ""
+         for x in 0...maxX {
+            line += (self[.init(x,y)]?.description ?? " ")
+         }
+         lines.append(line)
       }
+      return lines.joined(separator: "\n")
    }
 }
+
+struct Point: Equatable, Hashable {
+   let x: Int
+   let y: Int
+   
+   public init(_ x: Int, _ y: Int) {
+      self.x = x
+      self.y = y
+   }
+}
+
 
 extension Point {
    static func + (lhs: Point, rhs: Point) -> Point {
@@ -48,4 +70,29 @@ extension Point {
 
 extension Point: CustomStringConvertible {
    var description: String {"(\(x), \(y))"}
+}
+
+
+enum Heading: CaseIterable, Hashable {
+   case N, S, E, W, NE, SE, SW, NW
+   
+   static func headings(diagonal: Bool) -> [Heading] {
+      switch diagonal {
+         case false: [.N, .S, .E, .W]
+         case true: Heading.allCases
+      }
+   }
+   
+   func moving(step: Int = 1 ) -> (heading: Heading, x: Int, y: Int) {
+      switch self {
+         case .N: (.N, 0, -step)
+         case .S: (.S, 0, step)
+         case .E: (.E, step, 0)
+         case .W: (.W, -step ,0)
+         case .NE: (.NE, step, -step)
+         case .SE: (.SE, step, step)
+         case .SW: (.SW, -step, step)
+         case .NW: (.NW, -step, -step)
+      }
+   }
 }

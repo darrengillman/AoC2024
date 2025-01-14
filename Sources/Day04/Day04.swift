@@ -48,41 +48,7 @@ struct Day04: AdventDay, Sendable {
 
 
 // Add any extra code and types in here to separate it from the required behaviour
-extension Day04 {}
 
-struct Point: Equatable, Hashable {
-   let x: Int
-   let y: Int
-   
-   public init(_ x: Int, _ y: Int) {
-      self.x = x
-      self.y = y
-   }
-}
-
-enum Heading: CaseIterable, Hashable {
-   case N, S, E, W, NE, SE, SW, NW
-   
-   static func headings(diagonal: Bool) -> [Heading] {
-      switch diagonal {
-         case false: [.N, .S, .E, .W]
-         case true: Heading.allCases
-      }
-   }
-   
-   func moving(step: Int = 1 ) -> (heading: Heading, x: Int, y: Int) {
-      switch self {
-         case .N: (.N, 0, -step)
-         case .S: (.S, 0, step)
-         case .E: (.E, step, 0)
-         case .W: (.W, -step ,0)
-         case .NE: (.NE, step, -step)
-         case .SE: (.SE, step, step)
-         case .SW: (.SW, -step, step)
-         case .NW: (.NW, -step, -step)
-      }
-   }
-}
 
 
 struct Move {

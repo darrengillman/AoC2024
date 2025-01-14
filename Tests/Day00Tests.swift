@@ -21,18 +21,14 @@ struct Day00Tests {
          
          @Test("Part1 example")
          func testPart1() async throws {
-            await withKnownIssue(isIntermittent: true) {
-               let result = try await day.part1()
-               #expect(result == 11)
-            }
+            let result = try await day.part1()
+            #expect(result == 11)
          }
          
          @Test("Part2 example")
          func testPart2() async throws {
-            await withKnownIssue {
-               let result = try await day.part2()
-               #expect(result == 31)
-            }
+            let result = try await day.part2()
+            #expect(result == 31)
          }
       }
    }
