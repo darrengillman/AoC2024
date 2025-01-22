@@ -70,10 +70,41 @@ struct Day17Tests {
             #expect(result == "4,6,3,5,6,3,5,2,1,0")
          }
          
+         private let testInputA =
+  """
+  Register A: 9
+  Register B: 0
+  Register C: 0
+  
+  Program: 0,1,5,4,3,0
+  """
+
+         
+         
+         @Test("Part1B example")
+         func testPart1A() async throws {
+            let day = Day17(data: testInputA)
+            let result = try await day.part1()
+            #expect(result == "4,6,3,5,6,3,5,2,1,0")
+         }
+         /*
+          0 ->0
+          1 -> 0
+          2 -> 1,0
+          3 -> 1,0
+          4 -> 2,1,0
+          5 -> 2,1,0
+          6 -> 3,1,0
+          7 -> 3,1,0
+          8 -> 4,2,1,0
+          9 -> 4,2,1,0
+          */
+         
          @Test("Part2 example")
          func testPart2() async throws {
+            let day = Day17(data: pt2Input)
             let result = try await day.part2()
-            #expect(result == "")
+            #expect(result == "117440")
          }
       }
    }
@@ -87,3 +118,21 @@ private let testInput =
   
   Program: 0,1,5,4,3,0
   """
+
+private let testInputA =
+  """
+  Register A: 7
+  Register B: 0
+  Register C: 0
+  
+  Program: 0,1,5,4,3,0
+  """
+
+private let pt2Input =
+"""
+Register A: 117440
+Register B: 0
+Register C: 0
+
+Program: 0,3,5,4,3,0
+"""
