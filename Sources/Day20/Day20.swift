@@ -15,11 +15,14 @@ struct Day20: AdventDay, Sendable {
    
       // Replace this with your solution for the first part of the day's challenge.
    func part1() async throws -> Int {
-      track.findCheats()
+      track.findSingleCheats()
+   }
+   
+   func part2() async throws -> Int {
+      track.findMultiCheats()
    }
 }
 
-   // Add any extra code and types in here to separate it from the required behaviour
 extension Day20 {
    enum Location {
       case path, wall
@@ -29,6 +32,9 @@ extension Day20 {
       var grid: [Point: Location] = [:]
       var maxX, maxY: Int
       var start, end: Point!
+      
+      var route: [Point] = []
+      var shortcuts: [Point] = []
       
       init(input: String) {
          let lines = input
@@ -47,19 +53,11 @@ extension Day20 {
          }
          maxX = grid.keys.map(\.x).max()!
          maxY = grid.keys.map(\.y).max()!
-         
+         route = { route(from: start, to: end) }()
+         shortcuts = { findShortCuts() }()
       }
       
-      func runPt1() -> Int {
-         0
-      }
-      
-      
-      func findCheats() -> Int {
-         let route = route(from: start, to: end)
-         let shortcuts = findShortCuts()
-         
-         
+      func findSingleCheats() -> Int {
          let savings = shortcuts.reduce(into: [Int]() ) {savings, shortcut in
             savings.append(contentsOf:  shortcut
                .neighbours
@@ -70,11 +68,31 @@ extension Day20 {
             )
          }
          
-         savings.reduce(into: [Int: Int]() ) {$0[$1,default: 0 ] += 1}
-            .sorted{$0.value < $1.value}
-            .forEach{print("\($0.key): \($0.value)")}
+//         savings.reduce(into: [Int: Int]() ) {$0[$1,default: 0 ] += 1}
+//            .sorted{$0.value < $1.value}
+//            .forEach{print("\($0.key): \($0.value)")}
          
          return savings.count{$0 >= 100}
+      }
+         
+      func hops(from a : Point, to b: Point) -> Int {
+         abs(route.firstIndex(of: a)! - route.firstIndex(of: b)!)
+      }
+      
+      func manhattan(from a : Point, to b: Point) -> Int {
+         abs(a.x - b.x) + abs(a.y - b.y)
+      }
+         
+      func findMultiCheats() -> Int {
+         let posInRoute: [Point: Int] = route.enumerated().reduce(into: [Point: Int]() ){ $0[$1.element] = $1.offset}
+         
+         return route
+            .combinations(ofCount: 2)
+            .filter{ manhattan(from: $0.first!, to: $0.last!) <= 20}
+            .map { abs(posInRoute[$0.first!]! - posInRoute[$0.last!]!) - manhattan(from: $0.first!, to: $0.last!) }
+            .count{$0 >= 100}
+         
+         
       }
       
       func findShortCuts() -> [Point] {
@@ -107,6 +125,4 @@ extension Day20 {
          fatalError()
       }
    }
-   
-   
 }
