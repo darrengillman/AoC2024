@@ -37,7 +37,7 @@ struct NumericKeypadTests {
        
        
        
-       @Test("Test short inputs", arguments: ["029A"])//, "980A", "179A", "456A", "379A" ])
+       @Test("Test short inputs", .tags(.current),  arguments: ["029A"] )//, "980A", "179A", "456A", "379A" ])
        func testShortNumpad(_ code: String) async throws{
           let day = Day21(data: code)
           let out = try await day.part1()

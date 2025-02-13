@@ -9,3 +9,7 @@ struct AdventDayTests {
     #expect(challenge.data.starts(with: "4514"))
   }
 }
+
+extension Tag {
+   @Tag static var current: Self
+}
