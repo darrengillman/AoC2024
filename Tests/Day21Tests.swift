@@ -49,10 +49,8 @@ struct NumericKeypadTests {
 
       @Test("Part1 example")
       func testPart1() async throws {
-        await withKnownIssue {
           let result = try await day.part1()
-          #expect(result == 10)
-        }
+          #expect(result == 126384)
       }
 
       @Test("Part2 example")
@@ -68,4 +66,9 @@ struct NumericKeypadTests {
 
 private let testInput =
   """
+  029A
+  980A
+  179A
+  456A
+  379A
   """
